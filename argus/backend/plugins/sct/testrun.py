@@ -109,7 +109,8 @@ class SCTTestRun(PluginModelBase):
     perf_total_errors = columns.Double()
     stress_cmd = columns.Text()
 
-    histograms = columns.List(value_type=columns.Map(key_type=columns.Text(), value_type=columns.UserDefinedType(user_type=PerformanceHDRHistogram)))
+    histograms = columns.List(value_type=columns.Map(key_type=columns.Text(
+    ), value_type=columns.UserDefinedType(user_type=PerformanceHDRHistogram)))
     test_method = columns.Ascii()
 
     @classmethod
@@ -265,11 +266,13 @@ class SCTTestRun(PluginModelBase):
         """converts scylla-server date to timestamp and adds revision in subseconds precision to diffirentiate
         scylla versions from the same day. It's not perfect, but we don't know exact version time."""
         try:
-            scylla_package_upgraded = [package for package in self.packages if package.name == "scylla-server-upgraded"][0]
+            scylla_package_upgraded = [
+                package for package in self.packages if package.name == "scylla-server-upgraded"][0]
         except IndexError:
             scylla_package_upgraded = None
         try:
-            scylla_package = scylla_package_upgraded or [package for package in self.packages if package.name == "scylla-server"][0]
+            scylla_package = scylla_package_upgraded or [
+                package for package in self.packages if package.name == "scylla-server"][0]
         except IndexError:
             raise ValueError("Scylla package not found in packages - cannot determine SUT timestamp")
         return (datetime.strptime(scylla_package.date, '%Y%m%d').replace(tzinfo=timezone.utc).timestamp()
